@@ -8,7 +8,7 @@ void main() {
   runApp(const MyApp());
 }
 
-const List<String> cndList = <String>['up', 'side', 'reflect']; // 照明条件のリスト
+const List<String> cndList = <String>['なし', 'ネガポジ', '補色']; // 実験条件のリスト
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -45,7 +45,10 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
+      body: Container(
+        alignment: Alignment(-1.0, 1.0),
+        color: Colors.blue[100],
+        padding: EdgeInsets.all(50),
         child: Form(
           child: ListView(
             children: [
@@ -57,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onChanged: (value) {
                     num = int.parse(value);
                   }),
-              SizedBox(height: 16.0),
+              SizedBox(height: 16),
               TextFormField(
                   decoration: InputDecoration(
                       labelText: '年齢', border: OutlineInputBorder()),
@@ -66,8 +69,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   onChanged: (value) {
                     age = int.parse(value);
                   }),
-              SizedBox(height: 16.0),
-              DropdownButton(
+              SizedBox(height: 16),
+              DropdownButtonFormField(
+                decoration: InputDecoration(
+                  labelText: '実験条件',
+                ),
                 items: cndList.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,

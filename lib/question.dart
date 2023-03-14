@@ -5,10 +5,16 @@ import 'dart:async';
 import 'dart:io';
 import 'package:external_path/external_path.dart';
 
+List<List<String>> questionList = <List<String>>[
+  ['見づらい', '見やすい'],
+  ['（枠線が）不自然', '自然']
+]; // アンケートのリスト
+var pointList = <double>[0, 0];
+
 class QuestionPage extends StatefulWidget {
   final int num; // 実験協力者番号
   final int age; // 年齢
-  final String cnd; // 照明条件
+  final String cnd; // 条件
   QuestionPage(this.num, this.age, this.cnd);
 
   @override
@@ -16,9 +22,6 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
-  double value1 = 0;
-  double value2 = 0;
-
   late int _num;
   late int _age;
   late String _cnd;
@@ -43,7 +46,7 @@ class _QuestionPageState extends State<QuestionPage> {
     _cnd = cnd;
   }
 
-  void outputText(double value1, double value2) {
+  void outputText(List pointList) {
     getPubDirFile().then((File file) {
       file.writeAsString('実験協力者No.,年齢,条件,見やすさ,自然さ', encoding: utf8);
       file.writeAsString(_num.toString() +
@@ -52,9 +55,9 @@ class _QuestionPageState extends State<QuestionPage> {
           ',' +
           _cnd.toString() +
           ',' +
-          value1.toString() +
+          pointList[0].toString() +
           ',' +
-          value2.toString());
+          pointList[1].toString());
     });
   }
 
@@ -83,45 +86,53 @@ class _QuestionPageState extends State<QuestionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('アンケート'),
+        title: Text('アンケート    実験協力者No. ' +
+            _num.toString() +
+            '    条件：' +
+            _cnd.toString()),
       ),
-      body: Center(
+      body: Container(
+        alignment: Alignment(-1.0, 1.0),
+        color: Colors.blue[100],
+        padding: EdgeInsets.all(50),
         child: Form(
-          child: ListView(
-            children: [
-              Text(_num.toString()),
-              Text(_cnd),
-              Text('見づらい ー 見やすい'),
+          child: ListView(children: [
+            for (int i = 0; i < questionList.length; i++) ...{
+              Container(
+                  alignment: Alignment(0.0, 0.0),
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(questionList[i][0],
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                      Text(questionList[i][1],
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                    ],
+                  )),
               Slider(
                   min: -1,
                   max: 1,
-                  value: value1,
+                  value: pointList[i],
                   activeColor: Colors.orange,
                   inactiveColor: Colors.blueAccent,
                   onChanged: (a) {
                     setState(() {
-                      value1 = a;
+                      pointList[i] = a;
                     });
                   }),
-              Text('（枠線が）不自然 ー 自然'),
-              Slider(
-                  min: -1,
-                  max: 1,
-                  value: value2,
-                  activeColor: Colors.orange,
-                  inactiveColor: Colors.blueAccent,
-                  onChanged: (a) {
-                    setState(() {
-                      value2 = a;
-                    });
-                  }),
-            ],
-          ),
+              SizedBox(
+                height: 16,
+              ),
+            }
+          ]),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          outputText(value1, value2);
+          outputText(pointList);
         },
         tooltip: 'Next',
         child: Icon(
